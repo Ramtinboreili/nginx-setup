@@ -1,8 +1,12 @@
----
-- hosts: web-servers
+- name: NGINX installation and configuration
+  hosts: web
   become: true
-  gather_facts: yes
-  name: setup nginx web server
-  roles:
-  # install and configure nginx service
-    - { role: nginx, become: True, tags: setup_nginx }
+  tasks:
+    - name: apt update cache
+      apt:
+        update_cache: yes
+
+    - name: install nginx
+      apt:
+        name: nginx
+        state: present
