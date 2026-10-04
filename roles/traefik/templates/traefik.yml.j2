@@ -1,0 +1,26 @@
+log:
+  level: "{{ traefik_log_level }}"
+
+entryPoints:
+  web:
+    address: ":{{ http_port }}"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+  websecure:
+    address: ":{{ https_port }}"
+
+providers:
+  file:
+    directory: "/etc/traefik/acme/http"
+    watch: true
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: "{{ acme_email }}"
+      storage: "{{ acme_storage }}"
+      httpChallenge:
+        entryPoint: web

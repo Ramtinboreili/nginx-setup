@@ -6,3 +6,11 @@
   roles:
   # install and configure nginx service
     - { role: nginx, become: True, tags: setup_nginx }
+
+# Install and configure traefik reverse proxy
+- hosts: web-servers
+  become: true
+  gather_facts: yes
+  name: setup traefik reverse proxy
+  roles:
+    - { role: traefik, become: True, tags: setup_traefik }

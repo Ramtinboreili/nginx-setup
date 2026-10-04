@@ -1,0 +1,14 @@
+---
+# Traefik role defaults
+traefik_version: "v3.3"
+traefik_image: "traefik:v3.3"
+traefik_user: "0"
+traefik_log_level: "INFO"
+
+# ACME / Let's Encrypt
+acme_email: "{{ domain }}@{{ tld }}"
+acme_storage: "/etc/traefik/acme/acme.json"
+
+# Ports
+http_port: 80
+https_port: 443

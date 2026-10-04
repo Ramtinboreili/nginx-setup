@@ -1,0 +1,65 @@
+---
+- name: Create traefik directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0644'
+  loop:
+    - /etc/traefik/acme
+    - /etc/traefik/acme/http
+  tags: configure_traefik
+
+- name: Ensure acme.json is a file with restricted permissions
+  copy:
+    content: "{}"
+    dest: /etc/traefik/acme/acme.json
+    mode: '0600'
+  tags: configure_traefik
+
+- name: Download Traefik binary
+  get_url:
+    url: "https://github.com/traefik/traefik/releases/download/{{ traefik_version }}/traefik_{{ traefik_version }}_linux-amd64.tar.gz"
+    dest: /tmp/traefik.tar.gz
+    mode: '0644'
+    validate_certs: true
+  tags: install_traefik
+
+- name: Extract Traefik binary
+  unarchive:
+    src: /tmp/traefik.tar.gz
+    dest: /usr/local/bin/
+    remote_src: true
+    creates: /usr/local/bin/traefik
+  tags: install_traefik
+
+- name: Remove downloaded archive
+  file:
+    path: /tmp/traefik.tar.gz
+    state: absent
+  tags: install_traefik
+
+- name: Write Traefik config
+  template:
+    src: traefik.yml.j2
+    dest: /etc/traefik/traefik.yml
+    mode: '0644'
+  notify: restart traefik
+  tags: configure_traefik
+
+- name: Write Traefik systemd unit
+  template:
+    src: traefik.service.j2
+    dest: /etc/systemd/system/traefik.service
+    mode: '0644'
+  notify:
+    - reload systemd
+    - restart traefik
+  tags: configure_traefik
+
+- name: Enable and start Traefik
+  systemd:
+    name: traefik
+    enabled: true
+    state: started
+    daemon_reload: true
+  tags: configure_traefik

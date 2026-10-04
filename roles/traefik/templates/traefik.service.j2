@@ -1,0 +1,16 @@
+[Unit]
+Description=Traefik reverse proxy
+Documentation=https://docs.traefik.io
+Requires=network.target network-online.target
+After=network-online.target
+
+[Service]
+Type=notify
+User=0
+Restart=always
+RestartSec=5
+Environment="PATH=/usr/local/bin:/usr/bin:/bin"
+ExecStart=/usr/local/bin/traefik --configFile=/etc/traefik/traefik.yml
+
+[Install]
+WantedBy=multi-user.target
